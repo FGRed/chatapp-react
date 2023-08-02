@@ -1,0 +1,15 @@
+.no-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #373d3f;
+}
+.border, .border-bottom, .border-left, .border-right {
+    border-color: #343434 !important;
+}
+.btn.btn-primary {
+    background: blueviolet !important;
+    border: #b465fa;
+}
+

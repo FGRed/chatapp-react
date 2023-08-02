@@ -1,0 +1,18 @@
+i.main-chat-page--nav-icon {
+    font-size: 25px;
+}
+.main-chat-page--nav-col.active{
+    background: #282c34;
+    color: blueviolet;
+}
+.main-chat-page--nav-col.passive{
+    background: var(--bs-body-bg) !important;
+}
+.main-chat-page--nav-col.passive:hover{
+    background: #282c34;
+    cursor: pointer;
+}
+#app-root{
+    height: 100svh;
+    background: #1d2125;
+}
