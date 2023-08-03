@@ -66,7 +66,7 @@ const LoginModal: FC<LoginProps> = ({show, onHide}) => {
                 </Row>
                 <Row className="mb-2">
                     <Col>
-                        <input onChange={(e)=>{setLoginData({...loginData, username: e.target.value})}} type="text" placeholder="Username" className="form-control"/>
+                        <input onChange={(e)=>{setLoginData({...loginData, username: e.target.value})}} type="text" placeholder="Input username or email address" className="form-control"/>
                     </Col>
                 </Row>
                 <Row className="mb-2">

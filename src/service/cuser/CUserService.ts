@@ -20,3 +20,21 @@ export const getCurrentSessionUser = async () => {
         console.error(ex)
     }
 }
+
+export const setEmail = async (email:string) => {
+    try{
+        const response = await axios.put(`/cuser/email-change/${email}`)
+        return response.data
+    }catch (ex){
+        console.error(ex)
+    }
+}
+
+export const setUsername = async (username:string) => {
+    try{
+        const response = await axios.put(`/cuser/username-change/${username}`)
+        return response.data
+    }catch (ex){
+        console.error(ex)
+    }
+}

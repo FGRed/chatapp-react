@@ -10,7 +10,6 @@ import Settings from "./Settings";
 import LoginModal from "../modals/LoginModal";
 import {useDispatch, useSelector} from "react-redux";
 import CUser from "../../model/cuser/CUser";
-import { ReactNotifications } from 'react-notifications-component'
 import {getCurrentSessionUser} from "../../service/cuser/CUserService";
 
 interface NavigationProps {
@@ -66,7 +65,7 @@ const Navigation: FC<NavigationProps> = ({activeIndex, setActiveIndex}) => {
     }, [activeIndex])
 
     return (
-        <Row className="main-chat-page--nav-col border-bottom">
+        <Row className="main-chat-page--nav-col border-start border-end border-bottom">
             {navButtons}
         </Row>
     )

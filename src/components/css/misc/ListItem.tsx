@@ -1,6 +1,5 @@
 import React, {FC} from "react";
 import {Col, Container, Row} from "react-bootstrap";
-import Settings from "../../chat-component/Settings";
 
 interface ListItemProps{
     settingName: string,

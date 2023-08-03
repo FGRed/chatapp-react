@@ -2,7 +2,7 @@ import React, {FC} from "react";
 import "../css/user/Avatar.css"
 import {Ratio} from "react-bootstrap";
 interface avatarProps {
-    avatar: string
+    avatar?: string
 }
 
 const Avatar: FC<avatarProps> = ({avatar}) => {
