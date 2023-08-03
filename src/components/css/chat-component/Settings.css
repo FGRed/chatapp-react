@@ -1,0 +1,22 @@
+.settings-button-wrapper {
+    display: flex;
+    gap: 10px
+}
+.settings-button-wrapper:last-child{
+    border: none !important;
+}
+.settings-button-wrapper:hover{
+    background: #262b2c;
+    cursor: pointer;
+}
+.settings-button-wrapper > * {
+    display: flex;
+    align-items: center;
+}
+.settings-button-wrapper > .settings-icon-col{
+    flex: 0 0 40px;
+    padding: 18px 18px 18px 30px
+}
+.settings-button-wrapper > .setting-content-col{
+    flex: 1;
+}

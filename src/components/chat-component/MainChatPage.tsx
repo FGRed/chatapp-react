@@ -6,8 +6,12 @@ import {Route, Routes, useNavigate} from "react-router";
 import ChatView from "./ChatView";
 import ChatsView from "./ChatsView";
 import Contacts from "./Contacts";
-import Settings from "../css/chat-component/Settings";
+import Settings from "./Settings";
 import LoginModal from "../modals/LoginModal";
+import {useDispatch, useSelector} from "react-redux";
+import CUser from "../../model/cuser/CUser";
+import { ReactNotifications } from 'react-notifications-component'
+import {getCurrentSessionUser} from "../../service/cuser/CUserService";
 
 interface NavigationProps {
     activeIndex: number;
@@ -75,12 +79,33 @@ const MainChatPage = () => {
     const [activeIndex, setActiveIndex] = React.useState<number>(2)
     const navigate = useNavigate()
 
+    const cuser = useSelector((state:CUser) => state)
+
     const minSwipeDistance = 150
 
     const onTouchStart = (e: any) => {
         setTouchEnd(0)
         setTouchStart(e.targetTouches[0].clientX)
     }
+
+    useEffect(()=>{
+
+    }, [cuser])
+
+    const dispatch = useDispatch()
+
+    React.useEffect(() => {
+        const getCurrentSessionUserAsync = async () => {
+            const currentUser:CUser = await getCurrentSessionUser()
+            if(currentUser){
+                dispatch({type:"SET_USER", cuser: currentUser})
+                setShow(false)
+            }else{
+                setShow(true)
+            }
+        }
+        getCurrentSessionUserAsync()
+    }, [])
 
     const onTouchMove = (e: any) => setTouchEnd(e.targetTouches[0].clientX)
 
@@ -114,13 +139,13 @@ const MainChatPage = () => {
     }, [activeIndex])
 
 
-    const [show, setShow] = useState(true)
+    const [show, setShow] = useState(false)
 
     return (
         <Container fluid="lg">
             <Row onTouchEnd={onTouchEnd} onTouchMove={onTouchMove} onTouchStart={onTouchStart}
                  className="justify-content-md-center">
-                <Col id="app-root" className="border position-relative">
+                <Col id="app-root" className="position-relative">
                     <Navigation setActiveIndex={setActiveIndex} activeIndex={activeIndex}/>
                     <Routes>
                         <Route element={<ChatView/>} path="/chat"/>

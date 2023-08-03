@@ -11,3 +11,12 @@ export const logIn = async (username:string, password:string) => {
         console.error(ex)
     }
 }
+
+export const getCurrentSessionUser = async () => {
+    try{
+        const response = await axios.get("/cuser/current")
+        return response.data
+    }catch (ex){
+        console.error(ex)
+    }
+}
