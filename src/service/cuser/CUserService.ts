@@ -5,7 +5,7 @@ export const logIn = async (username:string, password:string) => {
         const formData:FormData = new FormData()
         formData.append("username", username)
         formData.append("password", password)
-        const response = await axios.post("/cuser/log-in", formData)
+        const response = await axios.post("/session/", formData)
         return response.data
     }catch (ex){
         console.error(ex)
@@ -14,7 +14,7 @@ export const logIn = async (username:string, password:string) => {
 
 export const getCurrentSessionUser = async () => {
     try{
-        const response = await axios.get("/cuser/current")
+        const response = await axios.get("/session/current")
         return response.data
     }catch (ex){
         console.error(ex)
@@ -23,7 +23,7 @@ export const getCurrentSessionUser = async () => {
 
 export const setEmail = async (email:string) => {
     try{
-        const response = await axios.put(`/cuser/email-change/${email}`)
+        const response = await axios.put(`/cuser/email/${email}`)
         return response.data
     }catch (ex){
         console.error(ex)
@@ -32,7 +32,15 @@ export const setEmail = async (email:string) => {
 
 export const setUsername = async (username:string) => {
     try{
-        const response = await axios.put(`/cuser/username-change/${username}`)
+        const response = await axios.put(`/cuser/username/${username}`)
+        return response.data
+    }catch (ex){
+        console.error(ex)
+    }
+}
+export const logout = async () => {
+    try{
+        const response = await axios.delete(`/session/current`)
         return response.data
     }catch (ex){
         console.error(ex)

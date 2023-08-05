@@ -12,3 +12,9 @@ i.main-chat-page--nav-icon {
     background: #282c34;
     cursor: pointer;
 }
+.main-chat-page--nav-col.passive.enabled > *{
+    filter: brightness(30%);
+}
+.main-chat-page--nav-col.passive.enabled {
+    cursor: auto !important;
+}

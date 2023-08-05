@@ -3,8 +3,8 @@ interface Authority {
 }
 
 interface CUser {
-    id: number,
-    username: string,
+    id?: number,
+    username?: string,
     email?: string,
     avatar?: string,
     role?: string,

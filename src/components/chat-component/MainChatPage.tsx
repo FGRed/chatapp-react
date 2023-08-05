@@ -21,6 +21,9 @@ const Navigation: FC<NavigationProps> = ({activeIndex, setActiveIndex}) => {
 
     const [navButtons, setNavButtons] = useState<Array<ReactNode>>([])
     const navigate = useNavigate()
+    const dispatch = useDispatch()
+
+    const cuser = useSelector((state:any) => state.cuserReducer)
 
     const navButtonIcons = [
         {
@@ -40,7 +43,7 @@ const Navigation: FC<NavigationProps> = ({activeIndex, setActiveIndex}) => {
         },
         {
             icon: "bi-gear", redirect: () => {
-                navigate("/contacts")
+                navigate("/settings")
             }
         }
     ]
@@ -49,20 +52,35 @@ const Navigation: FC<NavigationProps> = ({activeIndex, setActiveIndex}) => {
         setActiveIndex(i)
     }
 
+    const showLoginModal = (show: boolean) => {
+        if (show) {
+            dispatch({type: "SHOW_LOGIN_MODAL"})
+        } else {
+            dispatch({type: "HIDE_LOGIN_MODAL"})
+        }
+    }
+
     useEffect(() => {
+
+        const loggedIn = cuser.id !== undefined && cuser.id !== null
+        console.log(cuser)
+
         setNavButtons(navButtonIcons.map((navButtonIcon, i: number) => (
                 <Col
-                    className={`py-2 text-center main-chat-page--nav-col ${i === activeIndex ? "active" : "passive"}`}
+                    className={`py-2 text-center main-chat-page--nav-col ${i === activeIndex ? "active" : "passive"} ${loggedIn ? "" : " enabled"}`}
                     onClick={() => {
-                        onClick(i);
-                        navButtonIcon.redirect();
+                        if(loggedIn){
+                            onClick(i);
+                            navButtonIcon.redirect();
+                        }
                     }}>
                     <i className={`bi ${navButtonIcon.icon} main-chat-page--nav-icon`}/>
                 </Col>
             ))
         )
+        showLoginModal(!loggedIn)
 
-    }, [activeIndex])
+    }, [activeIndex, cuser])
 
     return (
         <Row className="main-chat-page--nav-col border-start border-end border-bottom">
@@ -78,7 +96,7 @@ const MainChatPage = () => {
     const [activeIndex, setActiveIndex] = React.useState<number>(2)
     const navigate = useNavigate()
 
-    const cuser = useSelector((state:CUser) => state)
+    const cuser = useSelector((state: CUser) => state)
 
     const minSwipeDistance = 150
 
@@ -87,20 +105,18 @@ const MainChatPage = () => {
         setTouchStart(e.targetTouches[0].clientX)
     }
 
-    useEffect(()=>{
-
-    }, [cuser])
 
     const dispatch = useDispatch()
 
     React.useEffect(() => {
         const getCurrentSessionUserAsync = async () => {
-            const currentUser:CUser = await getCurrentSessionUser()
-            if(currentUser){
-                dispatch({type:"SET_USER", cuser: currentUser})
-                setShow(false)
-            }else{
-                setShow(true)
+            const currentUser: CUser = await getCurrentSessionUser()
+            if (currentUser) {
+                dispatch({type: "SET_USER", cuser: currentUser})
+                showLoginModal(false)
+            } else {
+                setActiveIndex(3)
+                showLoginModal(true)
             }
         }
         getCurrentSessionUserAsync()
@@ -125,6 +141,15 @@ const MainChatPage = () => {
         }
     }
 
+    const showLoginModal = (show: boolean) => {
+        if (show) {
+            dispatch({type: "SHOW_LOGIN_MODAL"})
+        } else {
+            dispatch({type: "HIDE_LOGIN_MODAL"})
+        }
+
+    }
+
     useEffect(() => {
         if (activeIndex === 0) {
             navigate("/chat")
@@ -132,13 +157,13 @@ const MainChatPage = () => {
             navigate("/chats")
         } else if (activeIndex === 2) {
             navigate("/contacts")
-        }else if (activeIndex === 3) {
+        } else if (activeIndex === 3) {
             navigate("/settings")
         }
     }, [activeIndex])
 
 
-    const [show, setShow] = useState(false)
+    const show: boolean = useSelector((state: any) => state.modalsReducer.showLoginModal)
 
     return (
         <Container fluid="lg">
@@ -154,7 +179,9 @@ const MainChatPage = () => {
                     </Routes>
                 </Col>
             </Row>
-            <LoginModal show={show} onHide={()=>{setShow(false)}}/>
+            <LoginModal show={show} onHide={() => {
+                showLoginModal(false)
+            }}/>
         </Container>
     )
 }

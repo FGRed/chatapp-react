@@ -1,16 +1,17 @@
 import React, {FC} from "react";
 import {Col, Container, Row} from "react-bootstrap";
 
-interface ListItemProps{
+interface ListItemProps {
     settingName: string,
     settingExplanation: string,
-    icon: string
+    icon: string,
+    onClick?: () => void
 }
 
-const ListItem:FC<ListItemProps>=({settingName, settingExplanation, icon})=>{
+const ListItem:FC<ListItemProps>=({settingName, settingExplanation, icon, onClick})=>{
 
     return(
-        <div className="settings-button-wrapper border-bottom py-3">
+        <div className="settings-button-wrapper border-bottom py-3" onClick={onClick}>
             <div className="settings-icon-col">
                 <h1><i className={"bi " + icon}/></h1>
             </div>

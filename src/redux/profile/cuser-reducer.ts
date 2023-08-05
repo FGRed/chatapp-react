@@ -1,7 +1,7 @@
 import CUser from "../../model/cuser/CUser";
 
 const user: CUser = {
-    id: -1,
+    id: undefined,
     username: "",
     avatar: "",
     online: false,

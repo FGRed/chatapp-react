@@ -1,3 +1,8 @@
-.gear-icon{
-    padding-top: 10px;
+.image-holder-loaded > img{
+    background: none !important;
+}
+
+.image-holder-loaded {
+    min-width: 350px;
+    min-height: 350px;
 }
