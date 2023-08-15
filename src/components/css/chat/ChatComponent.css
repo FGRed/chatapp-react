@@ -1,0 +1,25 @@
+.chat-component{
+    display: flex;
+    gap: 20px
+}
+.chat-component:hover{
+    background: #282c34;
+    cursor: pointer;
+}
+.chat-component > .chats-avatar {
+    flex: 0 0 150px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.chat-component > .chat-info{
+    flex: 1;
+}
+.chat-component-header{
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+.chat-component-header > small{
+   font-size: 12px;
+}

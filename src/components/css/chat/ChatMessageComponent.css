@@ -1,0 +1,29 @@
+.chat-message {
+    display: flex;
+    padding: 15px;
+    gap: 20px;
+}
+
+.chat-message > .chat-avatar {
+    flex: 0 0 100px;
+    display: flex;
+    justify-content: center;
+}
+
+.chat-message > .text {
+    flex: 1;
+}
+.text-header{
+    display: flex;
+    align-items:baseline;
+    gap: 10px;
+    margin-bottom: 5px;
+}
+
+.text-header > a, h5{
+    margin: 0 !important;
+}
+.text-header > .id {
+    font-size: 11px;
+    margin: 0 !important;
+}

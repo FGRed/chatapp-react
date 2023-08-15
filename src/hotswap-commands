@@ -1,0 +1,9 @@
+docker run \
+    --name chatapp \
+    --link mongodb \
+    -e MONGO_URL=mongodb \
+    -e PORT=4000 \
+    -p 4000:4000 \
+    -v `pwd`/nodejs-with-mongodb-api-example:/src \
+    -v nodemodules:/src/node_modules \
+    app npm run dev:watch

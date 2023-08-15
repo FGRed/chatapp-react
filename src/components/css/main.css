@@ -13,3 +13,21 @@
     border: #b465fa;
 }
 
+.btn.btn-outline-primary {
+    color: blueviolet !important;
+    border-color: blueviolet;
+}
+
+.btn.btn-outline-primary:hover {
+    background: blueviolet !important;
+    color: #ffffff !important;
+}
+.btn.btn-outline-secondary {
+    border-color: rgb(118, 118, 118) !important;
+    color: rgb(118, 118, 118)  !important;
+}
+.btn.btn-outline-secondary:hover {
+    color: #ffffff !important;
+    background: rgb(118, 118, 118) !important;
+}
+

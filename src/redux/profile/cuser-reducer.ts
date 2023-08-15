@@ -20,6 +20,8 @@ interface Action {
 const cuserReducer = (state =  user, action: Action) => {
     if (action.type === 'SET_USER') {
         return action.cuser
+    }else if (action.type === "RESET_USER") {
+        return user
     } else {
         return state
     }

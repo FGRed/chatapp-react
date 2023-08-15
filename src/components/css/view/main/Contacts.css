@@ -1,0 +1,11 @@
+.contact--contact-list-item {
+    display: flex;
+}
+
+.contact--contact-list-item > .right{
+    flex: 1;
+}
+
+.contact--contact-list-item > .left {
+    flex: 0 0 50px;
+}

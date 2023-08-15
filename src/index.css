@@ -12,8 +12,10 @@ code {
     monospace;
 }
 
-#app-root, html, body{
-  height: 100lvh;
+#app-root {
+  height: 100svh;
   background: #1d2125;
   overflow: auto;
 }
+
+

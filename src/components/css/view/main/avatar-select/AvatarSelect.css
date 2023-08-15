@@ -1,0 +1,24 @@
+.avatar-preview {
+    display: flex;
+    margin: 10px 0 10px 0;
+}
+
+.cropper-select{
+    display: flex;
+    align-items: center;
+}
+
+.avatar-preview > .right{
+    flex: 0 0 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.avatar-preview > .left{
+    flex: 1;
+    display: flex;
+}
+.user-info-col > *{
+    font-size: 14px !important;
+}

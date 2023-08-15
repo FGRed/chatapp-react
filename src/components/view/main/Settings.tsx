@@ -1,16 +1,19 @@
 import React, {FC} from "react";
 import {Col, Container, Row} from "react-bootstrap";
-import UserInfoRibbon from "../user/UserInfoRibbon";
-import "../css/chat-component/Settings.css"
-import ListItem from "../css/misc/ListItem";
+import UserInfoRibbon from "../../user/UserInfoRibbon";
+import "../../css/view/main/Settings.css"
+import ListItem from "../../css/misc/ListItem";
 import {useDispatch, useSelector} from "react-redux";
-import CUser from "../../model/cuser/CUser";
-import {logout} from "../../service/cuser/CUserService";
+import CUser from "../../../model/cuser/CUser";
+import {logout} from "../../../service/cuser/CUserService";
+import {useNavigate} from "react-router";
+
 
 const Settings = () => {
 
     const user: CUser = useSelector((state: any) => state.cuserReducer)
     const dispatch = useDispatch()
+    const navigate = useNavigate()
 
     const showLoginModal = (show: boolean) => {
         if (show) {
@@ -20,9 +23,24 @@ const Settings = () => {
         }
     }
 
-    const onLogout = async () => {
-        const cuser = await logout()
-        dispatch({type: "SET_USER", cuser: cuser})
+    const onLogout = () => {
+
+        const logoutAsync= async()=>{
+            const cuser = await logout()
+            dispatch({type: "RESET_USER"})
+            dispatch({type:"HIDE_DIALOG"})
+        }
+
+        dispatch({
+            type:"SET_DIALOG",
+            message:"Are you sure you want to log out?",
+            title:"Warning",
+            acceptFunction:()=>{
+                 logoutAsync()
+            }
+        })
+
+
     }
 
     return (
@@ -35,7 +53,7 @@ const Settings = () => {
                               icon="bi-person-lines-fill"/>
                     <ListItem settingName="Messages" settingExplanation="Edit message settings"
                               icon="bi-chat-dots-fill"/>
-                    <ListItem settingName="State"
+                    <ListItem settingName="Account"
                               settingExplanation="Change account state. Put it on hold or remove it."
                               icon="bi-person-square"/>
                     <ListItem settingName="Password"
@@ -51,7 +69,7 @@ const Settings = () => {
                         showLoginModal(true)
                     }}/>
                     <ListItem settingName="Sign in" settingExplanation="Sign in to the app"
-                              icon="bi-box-arrow-in-right"/>
+                              icon="bi-box-arrow-in-right" onClick={()=>{navigate("/register")}}/>
                     <ListItem settingName="Password"
                               settingExplanation="Recover password" icon="bi-lock-fill"/>
                 </div>

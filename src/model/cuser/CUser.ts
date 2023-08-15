@@ -11,7 +11,8 @@ interface CUser {
     online?: boolean,
     creationDate?: Date,
     lastLogin?: Date,
-    authorities?: Authority[]
+    authorities?: Authority[],
+    freeWord?: string
 }
 
 export default CUser
