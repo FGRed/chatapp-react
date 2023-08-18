@@ -3,6 +3,7 @@ import {Col, Row, Spinner} from "react-bootstrap";
 import {getChats} from "../../../service/chat/ChatService";
 import ChatsComponent from "../../chat/ChatsComponent";
 import Chat from "../../../model/chat/Chat";
+import FadeIn from "react-fade-in";
 
 const ChatsView = () => {
 
@@ -23,21 +24,23 @@ const ChatsView = () => {
     return (
         <Row>
             <Col>
-                {chats && chats.length > 0 &&
-                    chats.map((chat: Chat) => (
-                        <ChatsComponent chat={chat}/>
-                    ))
-                }
-                {chats &&
-                !showSpinner ?
-                    <h2 className="no-content">
-                        {!chats && "No chats available"}
-                    </h2>
-                    :
-                    <div className="no-content">
-                        <Spinner/>
-                    </div>
-                }
+                <FadeIn childClassName="div">
+                    {chats && chats.length > 0 &&
+                        chats.map((chat: Chat) => (
+                            <ChatsComponent chat={chat}/>
+                        ))
+                    }
+                    {chats &&
+                    !showSpinner ?
+                        <h2 className="no-content">
+                            {!chats && "No chats available"}
+                        </h2>
+                        :
+                        <div className="no-content">
+                            <Spinner/>
+                        </div>
+                    }
+                </FadeIn>
             </Col>
         </Row>
     )

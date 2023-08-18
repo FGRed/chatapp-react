@@ -34,7 +34,7 @@ const UserInfoRibbon: FC<PropType> = ({user}) => {
         });
     }
 
-    const saveEmail = async (email: string ) => {
+    const saveEmail = async (email: string) => {
         const cuser = await setEmail(email)
         if (cuser) {
             dispatch({type: "SET_USER", cuser: cuser})
@@ -42,7 +42,7 @@ const UserInfoRibbon: FC<PropType> = ({user}) => {
         }
     }
 
-    const saveUsername= async (username: string) => {
+    const saveUsername = async (username: string) => {
         const cuser = await setUsername(username)
         if (cuser) {
             dispatch({type: "SET_USER", cuser: cuser})
@@ -50,7 +50,6 @@ const UserInfoRibbon: FC<PropType> = ({user}) => {
         }
     }
 
-    const [image, setImage] = React.useState("")
     const inputFile: any = useRef()
 
     const onChooseFile = () => {
@@ -60,16 +59,22 @@ const UserInfoRibbon: FC<PropType> = ({user}) => {
     }
 
     const onFileChange = async (evt: any) => {
+        console.log("File changed")
         var file = evt.target.files[0];
-        dispatch({type:"SHOW_IMAGE_CROPPER", selectedFile: file})
-        /*const maxSize = 50 * 50
-        setSHowSpinner(true)
-        ImageCompressor.compressImage(file, 0.05, async (compressedBlob) => {
-                const cuser = await changeAvatar(compressedBlob)
-                dispatch({type: "SET_USER", cuser})
-                showNotification("Avatar image changed", "success")
-                setSHowSpinner(false)
-        })*/
+        if (file.size < 20 * 1000 * 1000) {
+            dispatch({type: "SHOW_IMAGE_CROPPER", selectedFile: file})
+        } else {
+            alert("Image file too large! Select a file under 20Mb.")
+        }
+        evt.target.value = null
+    }
+
+    const onEditCurrent = async () => {
+        if(user.avatar){
+            const file = ImageCompressor.base64ToFile("data:image/jpeg;base64,"+user.avatar, "test")
+            dispatch({type:"SHOW_IMAGE_CROPPER", selectedFile: file})
+        }
+
     }
 
     return (
@@ -78,7 +83,11 @@ const UserInfoRibbon: FC<PropType> = ({user}) => {
                 <Avatar avatar={user?.avatar} variant="user-ribbon">
                     <div className="user-ribbon--change-avatar-btn" onClick={onChooseFile}>
                         <i className="bi bi-camera-fill"/>
-                        <input accept="image/*" type='file' id='file' ref={inputFile} style={{display: 'none'}} onChange={onFileChange}/>
+                        <input accept="image/*" type='file' id='file' ref={inputFile} style={{display: 'none'}}
+                               onChange={onFileChange}/>
+                    </div>
+                    <div className="user-ribbon--edit-current" onClick={onEditCurrent}>
+                        <i className="bi bi-pencil-fill"/>
                     </div>
                     {showSpinner &&
                         <div className="user-ribbon--spinner">
@@ -91,7 +100,8 @@ const UserInfoRibbon: FC<PropType> = ({user}) => {
                 <Container className="g-0">
                     <RibbonCol value={user?.username} field="Username" editFunction={saveUsername}/>
                     <RibbonCol value={user?.email} field="Email" editFunction={saveEmail}/>
-                    <RibbonCol value={user?.freeWord} field="Free word" editFunction={()=>{}}/>
+                    <RibbonCol value={user?.freeWord} field="Free word" editFunction={() => {
+                    }}/>
                 </Container>
             </div>
         </div>
@@ -127,7 +137,8 @@ const RibbonCol: FC<PropTypes> = ({value, field, editFunction}) => {
                         <div className="input-group mb-3">
                             <input onChange={(e) => {
                                 setUserInput(e.target.value)
-                            }} autoFocus ref={ref} className="form-control" placeholder={field && "Edit " + field.toLowerCase()}
+                            }} autoFocus ref={ref} className="form-control"
+                                   placeholder={field && "Edit " + field.toLowerCase()}
                                    defaultValue={value}/>
                             <a href="#!" className="text-secondary input-group-text"
                                onClick={() => {
@@ -146,7 +157,7 @@ const RibbonCol: FC<PropTypes> = ({value, field, editFunction}) => {
     )
 }
 
-const spinner=()=>{
+const spinner = () => {
 
 }
 

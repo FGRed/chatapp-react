@@ -1,5 +1,5 @@
 import React, {createRef, FC, useEffect, useRef, useState} from "react";
-import {Col, Container, Modal, Row} from "react-bootstrap";
+import {Col, Container, Modal, Row, Spinner} from "react-bootstrap";
 import {useDispatch, useSelector} from "react-redux";
 import 'react-image-crop/dist/ReactCrop.css'
 import {centerCrop, Crop, makeAspectCrop, PixelCrop, ReactCrop} from "react-image-crop";
@@ -19,8 +19,8 @@ const SelectAvatar = () => {
     const [completedCrop, setCompletedCrop] = useState<PixelCrop>()
     const fileCropperOpt: any = useSelector((state: any) => state.imageCropperReducer)
     const previewCanvasRef: any = useRef()
-    const cuser: CUser = useSelector((state: any) => state.cuserReducer)
     const [imgFile, setImgFile]: any = useState<any>(null)
+    const [disableCrop, setDisableCrop] = useState(false)
     const dispatch = useDispatch()
 
     useEffect(() => {
@@ -61,32 +61,41 @@ const SelectAvatar = () => {
     }
 
     const onHide = () => {
-        dispatch({type: "HIDE_IMAGE_CROPPER"})
+        if(!disableCrop){
+            dispatch({type: "HIDE_IMAGE_CROPPER"})
+        }
     }
 
-    const save = () => {
+    const save = async () => {
         if (imgFile) {
 
             const changeAvatarAs = async (file: File | Blob) => {
                 const cuser = await changeAvatar(file)
-                dispatch({type: "SET_USER", cuser})
-                showSuccess("Avatar image changed")
-                onHide()
-            }
-            if (imgFile.size / 1000000 > 1) {
-                if (window.confirm(`Maximum file size exceeded (${(imgFile.size / 1000000).toFixed(2)}Mb). Do you want to compress the file to 1Mb?`)) {
-                    ImageCompressor.compressImage(imgFile, 0.05, async (compressedBlob) => {
-                        changeAvatarAs(compressedBlob)
-                    })
-                } else {
-                    changeAvatarAs(imgFile)
+                if(cuser) {
+                    dispatch({type: "SET_USER", cuser})
+                    showSuccess("Avatar image changed")
+                    onHide()
                 }
+            }
+            console.log(imgFile.size / 10000)
+
+            if (imgFile.size / 10000 > 100) {
+                if (window.confirm(`Maximum file size exceeded (${(imgFile.size / 10000).toFixed(2)}Kb). Do you want to compress the file to 100Kb?`)) {
+                    setDisableCrop(false)
+                    ImageCompressor.compressImage(imgFile, 0.1, async (compressedBlob) => {
+                        changeAvatarAs(compressedBlob)
+                        setDisableCrop(true)
+                    })
+                }
+            }else{
+                changeAvatarAs(imgFile)
             }
         }
     }
 
     useDebounceEffect(
         async () => {
+            setDisableCrop(true)
             if (
                 completedCrop?.width &&
                 completedCrop?.height &&
@@ -101,6 +110,8 @@ const SelectAvatar = () => {
                     1,
                     0,
                 )
+
+                convertToImgFile()
             }
         },
         100,
@@ -117,6 +128,7 @@ const SelectAvatar = () => {
             }
             const fileImg = new File([blob], "avatar")
             setImgFile(fileImg)
+            setDisableCrop(false)
         })
     }
 
@@ -135,7 +147,6 @@ const SelectAvatar = () => {
                             }}
                             onComplete={(c) => {
                                 setCompletedCrop(c);
-                                convertToImgFile();
                             }}
                             aspect={1}
                             className="mx-auto">
@@ -158,7 +169,7 @@ const SelectAvatar = () => {
                             style={{
                                 border: '1px solid black',
                                 borderRadius: "0.375rem",
-                                objectFit: 'contain',
+                                objectFit: 'cover',
                                 width: 100,
                                 height: 100,
                             }}
@@ -169,17 +180,17 @@ const SelectAvatar = () => {
                             <UserInfoCol field="Resolution" text={(completedCrop
                                     && Math.trunc(completedCrop.width)) +
                                 " x " + (completedCrop && Math.trunc(completedCrop.height)) + "px"}/>
-                            <UserInfoCol field="Size" text={imgFile && (imgFile.size / 1000000).toFixed(2) + "Mb"}/>
+                            <UserInfoCol field="Size" text={imgFile && (imgFile.size / 10000).toFixed(2) + "Kb"}/>
                         </Container>
                     </div>
                 </div>
             </Modal.Body>
             <Modal.Footer>
-                <button className="btn btn-secondary-outline">
+                <button className="btn btn-secondary-outline" onClick={onHide}>
                     Cancel
                 </button>
-                <button className="btn btn-primary" onClick={save}>
-                    Crop & Save
+                <button className={"btn btn-primary " + (disableCrop &&  "disabled")} onClick={save}>
+                    Crop & Save {disableCrop && <Spinner size="sm"/>}
                 </button>
             </Modal.Footer>
         </Modal>

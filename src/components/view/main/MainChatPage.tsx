@@ -178,7 +178,7 @@ const MainChatPage = () => {
     const show: boolean = useSelector((state: any) => state.modalsReducer.showLoginModal)
 
     return (
-        <Container fluid="lg">
+        <Container fluid>
             <Row onTouchEnd={onTouchEnd} onTouchMove={onTouchMove} onTouchStart={onTouchStart}
                  className="justify-content-sm-center">
                 <Col id="app-root" className="position-relative">

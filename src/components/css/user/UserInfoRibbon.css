@@ -67,6 +67,23 @@
     background: #38383b;
     cursor: pointer;
 }
+.user-ribbon--edit-current {
+    position: absolute;
+    bottom: 5px;
+    right: 59px;
+    background: #282c34;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 15px 18px;
+    border-radius: 50%;
+}
+
+.user-ribbon--edit-current:hover {
+    background: #38383b;
+    cursor: pointer;
+}
+
 .user-ribbon--spinner{
     position: absolute;
     display: flex;

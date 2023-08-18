@@ -48,8 +48,32 @@ class ImageCompressor {
         while (n--) {
             u8arr[n] = bstr.charCodeAt(n);
         }
-        return new Blob([u8arr], { type: mime });
+        return new Blob([u8arr], {type: mime});
     }
+
+    static base64ToFile(base64String:string, filename:string) {
+        // Extract the base64 data
+        const matches = base64String.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
+
+        if (!matches || matches.length !== 3) {
+            throw new Error("Invalid base64 string format");
+        }
+
+        const mimeType = matches[1];
+        const base64Data = matches[2];
+
+        // Decode the base64 data
+        const binaryData = atob(base64Data);
+
+        // Create a Blob
+        const blob = new Blob([new Uint8Array(binaryData.length).map((_, i) => binaryData.charCodeAt(i))], { type: mimeType });
+
+        // Create a File
+        const file = new File([blob], filename, { type: mimeType });
+
+        return file;
+    }
+
 }
 
 export default ImageCompressor;

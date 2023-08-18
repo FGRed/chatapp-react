@@ -10,6 +10,10 @@ import CUser from "../../../model/cuser/CUser";
 import {isMobile} from 'react-device-detect'
 // @ts-ignore
 import SockJsClient from 'react-stomp';
+import FadeIn from "react-fade-in";
+import useSound from "use-sound"
+// @ts-ignore
+import notif from "../../../sound/notif.mp3"
 
 const ChatView = () => {
 
@@ -20,6 +24,8 @@ const ChatView = () => {
     const [position, setPosition] = useState("position-absolute")
     const [chatMessage, setChatMessage] = useState<ChatMessageDTO>({receiverId: -1, text: "", chatId: ""})
     const inputRef:any = useRef()
+    const [playSound] = useSound(notif)
+
 
     useEffect(() => {
         let receiverId: number | undefined
@@ -60,6 +66,7 @@ const ChatView = () => {
         }else{
             setPosition("position-absolute")
         }
+        scrollToBottom()
 
     }, [chatMessages])
 
@@ -80,7 +87,7 @@ const ChatView = () => {
 
     const addMsg = (msg: any) => {
         setChatMessages((prevItems: any) => [...prevItems, msg]);
-        scrollToBottom()
+        playSound()
     }
 
     const scrollToBottom = () => {
@@ -115,9 +122,11 @@ const ChatView = () => {
                             <Spinner/>
                         </div>
                     }
-                    {chatMessages && chatMessages.map((m: ChatMessage) => (
-                        <ChatMessageComponent message={m}/>
-                    ))}
+                    <FadeIn childClassName="div" delay={0.5}>
+                        {chatMessages && chatMessages.map((m: ChatMessage) => (
+                            <ChatMessageComponent message={m}/>
+                        ))}
+                    </FadeIn>
                 </Col>
                 {chatMessages &&
                     <div className={"chat-field border p-3 " + position}>
