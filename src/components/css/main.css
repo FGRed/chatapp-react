@@ -1,3 +1,8 @@
+:root {
+    --color-hover: #282C34;
+    --color-main: #212529;
+}
+
 .no-content {
     position: absolute;
     top: 50%;
@@ -30,4 +35,18 @@
     color: #ffffff !important;
     background: rgb(118, 118, 118) !important;
 }
+.bg-hover{
+    background: var(--color-hover);
+}
 
+@media screen and (max-width: 992px) {
+    .bg-hover{
+        display: none !important;
+    }
+}
+.form-control:focus {
+    background: none !important;
+}
+.form-control {
+    padding-right: 50px;
+}

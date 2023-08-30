@@ -7,3 +7,6 @@
 .mobile-view{
     padding-bottom: 71px;
 }
+.message-input {
+    padding-right: 70px !important;
+}

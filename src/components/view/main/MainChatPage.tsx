@@ -1,4 +1,4 @@
-import React, {ReactNode, useEffect, useState} from "react";
+import React, {ReactNode, useCallback, useEffect, useState} from "react";
 import {Col, Container, Row} from "react-bootstrap";
 import "bootstrap-icons/font/bootstrap-icons.min.css"
 import "../../css/view/main/MainChatPage.css"
@@ -11,10 +11,13 @@ import LoginModal from "../../modals/LoginModal";
 import {useDispatch, useSelector} from "react-redux";
 import CUser from "../../../model/cuser/CUser";
 import {getCurrentSessionUser} from "../../../service/cuser/CUserService";
-import axios from "axios";
-import {showError, showWarning} from "../../notifications/GeneralNotifications";
+import {showWarning} from "../../notifications/GeneralNotifications";
 import RegisterView from "../sign-in/RegisterView";
 import SelectAvatar from "./avatar-crop/SelectAvatar";
+// @ts-ignore
+import SockJsClient from 'react-stomp';
+import left from "../../../img/right.png";
+import {isMobile} from 'react-device-detect'
 
 
 const Navigation = () => {
@@ -25,6 +28,7 @@ const Navigation = () => {
 
     const cuser = useSelector((state: any) => state.cuserReducer)
     const activeIndex: number = useSelector((state: any) => state.navigationReducer)
+    const extraElement = useSelector((state: any) => state.extraElementReducer)
 
     const navButtonIcons = [
         {
@@ -65,7 +69,7 @@ const Navigation = () => {
         const loggedIn = cuser.id !== undefined && cuser.id !== null
         setNavButtons(navButtonIcons.map((navButtonIcon, i: number) => (
                 <Col
-                    className={`py-2 text-center main-chat-page--nav-col ${i === activeIndex ? "active": "passive " + (navButtonIcon.disabled && " enabled")} ${loggedIn ? "" : " enabled"}`}
+                    className={`py-2 text-center main-chat-page--nav-col ${i === activeIndex ? "active" : "passive " + (navButtonIcon.disabled && " enabled")} ${loggedIn ? "" : " enabled"}`}
                     onClick={() => {
                         if (loggedIn && !navButtonIcon.disabled) {
                             onClick(i);
@@ -82,11 +86,22 @@ const Navigation = () => {
     }, [activeIndex, cuser])
 
     return (
-        <Row className="main-chat-page--nav-col border-start border-end border-bottom">
-            {navButtons}
+        <Row
+            className="main-chat-page--nav-col border-start border-end border-bottom container-fluid px-0 mx-0 sticky-top shadow-sm">
+            <Row className="g-0">
+                {navButtons}
+            </Row>
+            <Row className="g-0">
+                <Col>
+                    {extraElement.element}
+                </Col>
+            </Row>
+
         </Row>
     )
 }
+
+
 
 const MainChatPage = () => {
 
@@ -105,21 +120,31 @@ const MainChatPage = () => {
     }
 
     const dispatch = useDispatch()
-    useEffect(() => {
-        axios.interceptors.response.use(
-            response => response,
-            error => {
-                if (error.response && error.response.status === 401) {
-                    showWarning("Session timeout. Please login again.")
-                    dispatch({type: "RESET_USER"})
-                    dispatch({type: "SET_ACTIVE_INDEX", activeIndex: 3})
-                    showLoginModal(true)
-                }
-                return Promise.reject(error);
+
+    const [ecchiMode, setEcchiMode] = useState(false)
+
+
+    const handleKeyPress = (event:any) => {
+        if(event.ctrlKey && event.key === "m"){
+
+            if(ecchiMode){
+                setEcchiMode(false)
+                console.log("ecchi false " + ecchiMode)
+            }else{
+                setEcchiMode(true)
+                console.log("ecchi true " + ecchiMode)
             }
-        );
-        console.log("Rendering main chat page")
-    }, [])
+
+        }
+    };
+
+    useEffect(()=>{
+        document.addEventListener('keydown', handleKeyPress)
+        return () => {
+            document.removeEventListener('keydown', handleKeyPress);
+        };
+    }, [ecchiMode])
+
     React.useEffect(() => {
         const getCurrentSessionUserAsync = async () => {
             const currentUser: CUser = await getCurrentSessionUser()
@@ -177,11 +202,28 @@ const MainChatPage = () => {
 
     const show: boolean = useSelector((state: any) => state.modalsReducer.showLoginModal)
 
+    const logout = () => {
+        if (cuser) {
+            dispatch({type: "RESET_USER"})
+            dispatch({type: "SET_ACTIVE_INDEX", activeIndex: 3})
+            showLoginModal(true)
+            showWarning("Session expired. Please, login.")
+        }
+    }
+
     return (
-        <Container fluid>
+        <Container fluid={true} className="g-0" style={{maxWidth: "800px"}}>
+            <SockJsClient
+                url="/api/ws"
+                topics={['/topic/session-timeout']}
+                onMessage={logout}
+                onConnect={() => {
+                    console.log("Connected")
+                }}>
+            </SockJsClient>
             <Row onTouchEnd={onTouchEnd} onTouchMove={onTouchMove} onTouchStart={onTouchStart}
-                 className="justify-content-sm-center">
-                <Col id="app-root" className="position-relative">
+                 className="justify-content-sm-center g-0">
+                <Col id="app-root" className="position-relative g-0">
                     <Navigation/>
                     <Routes>
                         <Route element={<ChatView/>} path="/chat"/>
@@ -191,6 +233,12 @@ const MainChatPage = () => {
                         <Route element={<RegisterView/>} path="/register"/>
                     </Routes>
                 </Col>
+                {ecchiMode &&
+                    <Col xs md="auto" className="bg-light graphics-col">
+                        <img alt="Failed to load" style={{objectFit: "cover", width: "100%", height: "100%"}}
+                             src={left}/>
+                    </Col>
+                }
             </Row>
             <LoginModal show={show} onHide={() => {
                 showLoginModal(false)

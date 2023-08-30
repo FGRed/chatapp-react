@@ -1,14 +1,12 @@
 import React, {createRef, FC, useRef, useState} from "react";
 import {useDispatch} from "react-redux";
 import CUser from "../../model/cuser/CUser";
-import {Col, Container, Ratio, Row, Spinner} from "react-bootstrap";
+import {Col, Container, Row, Spinner} from "react-bootstrap";
 import Avatar from "./Avatar";
 import "../css/user/UserInfoRibbon.css"
-import {changeAvatar, setEmail, setUsername} from "../../service/cuser/CUserService";
+import {setEmail, setUsername} from "../../service/cuser/CUserService";
 import {Store} from "react-notifications-component";
-import {fileToBase64} from "../util/FileUtil";
 import ImageCompressor from "../util/ImageCompressor";
-import {useNavigate} from "react-router";
 
 interface PropType {
     user: CUser
@@ -18,7 +16,6 @@ const UserInfoRibbon: FC<PropType> = ({user}) => {
 
     const dispatch = useDispatch()
     const [showSpinner, setSHowSpinner] = useState(false)
-    const navigate = useNavigate()
 
     const showNotification = (msg: string, type: any) => {
         Store.addNotification({

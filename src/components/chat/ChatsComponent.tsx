@@ -8,13 +8,14 @@ import {useNavigate} from "react-router";
 
 interface Props{
     chat:Chat
+    className?: string | undefined
+    showLatestMessage?: boolean | undefined
 }
 
-const ChatsComponent:FC<Props>=({chat})=>{
+const ChatsComponent:FC<Props>=({chat, className, showLatestMessage})=>{
 
     const[participantsString, setParticipantsString] = React.useState<string>("")
     const dispatch = useDispatch()
-    const navigate = useNavigate()
 
     useEffect(()=>{
         if(chat.chatParticipants) {
@@ -36,7 +37,7 @@ const ChatsComponent:FC<Props>=({chat})=>{
     }
 
     return(
-        <div className="chat-component p-4 border-bottom" onClick={openChat}>
+        <div className={"chat-component p-3 border-bottom " + className} onClick={openChat}>
             <div className="chats-avatar">
                 {
                     chat.chatParticipants.map(chat=>(
@@ -47,13 +48,11 @@ const ChatsComponent:FC<Props>=({chat})=>{
             <div className="chat-info">
                 <div className="chat-component-header">
                     <h5>{participantsString}</h5>
-                    <small className="text-secondary">id:{chat.id}</small>
                 </div>
-
-                {
-                    chat.lastMessage ?
+                {showLatestMessage &&
+                    (chat.lastMessage ?
                         <p>{chat.lastMessage}</p>
-                        :"No messages yet"
+                        :"No messages yet")
                 }
 
             </div>

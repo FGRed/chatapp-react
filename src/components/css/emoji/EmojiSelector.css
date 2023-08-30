@@ -1,0 +1,3 @@
+.epr-dark-theme, .epr-emoji-category-label {
+    background: var(--color-main) !important;
+}

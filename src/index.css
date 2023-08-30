@@ -16,6 +16,9 @@ code {
   height: 100svh;
   background: #1d2125;
   overflow: auto;
+  overflow-x: hidden;
 }
-
+#app-root::-webkit-scrollbar{
+  display: none;
+}
 

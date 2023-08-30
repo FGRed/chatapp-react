@@ -4,7 +4,7 @@ interface Action {
 }
 
 
-const navigationReducer = (state = 0, action: Action) => {
+const navigationReducer = (state = 3, action: Action) => {
     switch (action.type) {
         case "SET_ACTIVE_INDEX":
             return action.activeIndex

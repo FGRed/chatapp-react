@@ -16,7 +16,6 @@ const ListItem:FC<ListItemProps>=({settingName, settingExplanation, icon, onClic
                 <h1><i className={"bi " + icon}/></h1>
             </div>
             <div className="setting-content-col">
-                <Container>
                     <Col>
                         <Row>
                             <Col><h4>{settingName}</h4></Col>
@@ -25,8 +24,6 @@ const ListItem:FC<ListItemProps>=({settingName, settingExplanation, icon, onClic
                             <Col><p className="m-0">{settingExplanation}</p></Col>
                         </Row>
                     </Col>
-                </Container>
-
             </div>
         </div>
     )

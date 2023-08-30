@@ -5,7 +5,8 @@ import dialogReducer from "./modal/dialogReducer";
 import chatReducer from "./chat/chatReducer";
 import navigationReducer from "./navigation/navigationReducer";
 import imageCropperReducer from "./modal/imageCropperReducer";
+import extraElementReducer from "./extra-element/extraElementReducer";
 
 export default createStore(combineReducers(
-    {cuserReducer, modalsReducer, dialogReducer, chatReducer, navigationReducer, imageCropperReducer}
+    {cuserReducer, modalsReducer, dialogReducer, chatReducer, navigationReducer, imageCropperReducer, extraElementReducer}
 ))

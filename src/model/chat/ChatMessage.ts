@@ -6,7 +6,8 @@ interface ChatMessage {
     date: Date
     senderId: number,
     receiverId: number
-    sender: CUser
+    sender: CUser,
+    read: boolean
 }
 
 export interface ChatMessageDTO{
