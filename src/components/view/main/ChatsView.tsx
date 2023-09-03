@@ -24,7 +24,7 @@ const ChatsView = () => {
             <Col>
                 {chats && chats.length > 0 &&
                     chats.map((chat: Chat) => (
-                        <ChatsComponent showLatestMessage chat={chat}/>
+                        <ChatsComponent key={"chat-"+chat.id} showLatestMessage chat={chat}/>
                     ))
                 }
                 {chats &&

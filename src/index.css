@@ -18,7 +18,5 @@ code {
   overflow: auto;
   overflow-x: hidden;
 }
-#app-root::-webkit-scrollbar{
-  display: none;
-}
+
 

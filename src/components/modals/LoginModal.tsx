@@ -1,9 +1,7 @@
 import React, {FC, useState} from "react";
 import {Button, Col, Modal, Row} from "react-bootstrap";
-import {logIn, userAlreadyLoggedIn} from "../../service/cuser/CUserService"
+import {logIn} from "../../service/cuser/CUserService"
 import {useDispatch} from "react-redux";
-import {ReactNotifications} from 'react-notifications-component'
-import {Store} from 'react-notifications-component';
 import {showError, showSuccess} from "../notifications/GeneralNotifications";
 
 interface LoginProps {
@@ -33,7 +31,7 @@ const LoginModal: FC<LoginProps> = ({show, onHide}) => {
     }
 
     return (
-        <Modal show={show} onHide={onHide} backdrop="static" centered closeButton>
+        <Modal show={show} onHide={onHide} backdrop="static" centered>
             <Modal.Header closeButton className="border-0">
 
             </Modal.Header>

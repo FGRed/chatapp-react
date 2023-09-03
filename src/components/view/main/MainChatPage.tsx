@@ -68,7 +68,7 @@ const Navigation = () => {
 
         const loggedIn = cuser.id !== undefined && cuser.id !== null
         setNavButtons(navButtonIcons.map((navButtonIcon, i: number) => (
-                <Col
+                <Col key={"nav-btn-"+i}
                     className={`py-2 text-center main-chat-page--nav-col ${i === activeIndex ? "active" : "passive " + (navButtonIcon.disabled && " enabled")} ${loggedIn ? "" : " enabled"}`}
                     onClick={() => {
                         if (loggedIn && !navButtonIcon.disabled) {
@@ -110,7 +110,7 @@ const MainChatPage = () => {
     const navigate = useNavigate()
     const activeIndex: number = useSelector((state: any) => state.navigationReducer)
 
-    const cuser = useSelector((state: CUser) => state)
+    const cuser = useSelector((state: any) => state.cuserReducer)
 
     const minSwipeDistance = 150
 
@@ -145,7 +145,7 @@ const MainChatPage = () => {
         };
     }, [ecchiMode])
 
-    React.useEffect(() => {
+    useEffect(() => {
         const getCurrentSessionUserAsync = async () => {
             const currentUser: CUser = await getCurrentSessionUser()
             if (currentUser) {
@@ -213,14 +213,6 @@ const MainChatPage = () => {
 
     return (
         <Container fluid={true} className="g-0" style={{maxWidth: "800px"}}>
-            <SockJsClient
-                url="/api/ws"
-                topics={['/topic/session-timeout']}
-                onMessage={logout}
-                onConnect={() => {
-                    console.log("Connected")
-                }}>
-            </SockJsClient>
             <Row onTouchEnd={onTouchEnd} onTouchMove={onTouchMove} onTouchStart={onTouchStart}
                  className="justify-content-sm-center g-0">
                 <Col id="app-root" className="position-relative g-0">

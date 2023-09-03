@@ -14,7 +14,7 @@ export const showError=(message:string)=> {
     });
 }
 
-export const showWarning=(message:string)=> {
+export const showWarning=(message:string, duration?:number)=> {
     Store.addNotification({
         message: message,
         type: "warning",
@@ -23,12 +23,12 @@ export const showWarning=(message:string)=> {
         animationIn: ["animate__animated", "animate__fadeIn"],
         animationOut: ["animate__animated", "animate__fadeOut"],
         dismiss: {
-            duration: 5000,
+            duration: duration ? duration : 5000,
         }
     });
 }
 
-export const showSuccess=(message:string)=> {
+export const showSuccess=(message:string, duration?:number)=> {
     Store.addNotification({
         message: message,
         type: "success",
@@ -37,7 +37,7 @@ export const showSuccess=(message:string)=> {
         animationIn: ["animate__animated", "animate__fadeIn"],
         animationOut: ["animate__animated", "animate__fadeOut"],
         dismiss: {
-            duration: 5000,
+            duration: duration ? duration : 5000,
         }
     });
 }

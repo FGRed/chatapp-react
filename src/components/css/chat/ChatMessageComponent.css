@@ -14,7 +14,10 @@
 .chat-message > .body > .avatar {
     width: 50px !important;
 }
-
+.chat-message.clickable:hover{
+    filter: brightness(120%) !important;
+    cursor: pointer;
+}
 .chat-message > .body > .text{
     flex: 1;
 }
@@ -23,6 +26,9 @@
     background: rgba(180, 101, 250, 0.28) !important;
     border-color: rgba(180, 101, 250, 0.35) !important;
     float: right;
+}
+.chat-message.non-loaded{
+    filter: brightness(50%) !important;
 }
 
 .text-header{
@@ -42,4 +48,8 @@
 .text{
     overflow-wrap: break-word;
     max-width: 80%;
+}
+small.read-date{
+    font-size: 10px !important;
+
 }

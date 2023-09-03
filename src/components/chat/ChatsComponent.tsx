@@ -41,7 +41,7 @@ const ChatsComponent:FC<Props>=({chat, className, showLatestMessage})=>{
             <div className="chats-avatar">
                 {
                     chat.chatParticipants.map(chat=>(
-                        <Avatar className="me-2" variant="avatar-chat-message" avatar={chat.avatar}/>
+                        <Avatar key={"chat-participants-avatar-"+chat.id} className="me-2" variant="avatar-chat-message" avatar={chat.avatar}/>
                     ))
                 }
             </div>

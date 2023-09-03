@@ -16,13 +16,14 @@ import useSound from "use-sound"
 import notif from "../../../sound/notif.mp3"
 import ChatsComponent from "../../chat/ChatsComponent";
 import EmojiSelector from "../../emoji/EmojiSelector";
-
+import {Client} from '@stomp/stompjs';
+import {showSuccess} from "../../notifications/GeneralNotifications";
 
 const ChatView = () => {
 
     const chat: Chat = useSelector((state: any) => state.chatReducer)
     const cuser: CUser = useSelector((state: any) => state.cuserReducer)
-    const [chatMessages, setChatMessages]: any = useState<any>([])
+    const [chatMessages, setChatMessages]: any = useState<ChatMessage[]>([])
     const [showSpinner, setShowSpinner] = useState(true)
     const [position, setPosition] = useState("position-absolute")
     const [chatMessage, setChatMessage] = useState<ChatMessageDTO>({receiverId: -1, text: "", chatId: ""})
@@ -31,6 +32,7 @@ const ChatView = () => {
     const [socketConnected, setSocketConnected] = useState(false)
     const [loadTime, setLoadTime] = useState(0)
     const dispatch = useDispatch()
+    const [preventScroll, setPreventScroll] = useState(false)
 
     useEffect(() => {
         let receiverId: number | undefined
@@ -60,7 +62,6 @@ const ChatView = () => {
         setLoadTime(prevCount => prevCount + 1)
         interval.current = window.setInterval(() => {
             setLoadTime(prevCount => prevCount + 1)
-            console.log(interval)
         }, 1000)
     }
 
@@ -74,6 +75,11 @@ const ChatView = () => {
     }, [showSpinner])
 
     useEffect(() => {
+        loadMessages()
+    }, [])
+
+
+    const loadMessages = () => {
         setShowSpinner(true)
         const getChatMessagesAync = async () => {
             const messages = await getChatsMessages(chat.id)
@@ -81,7 +87,17 @@ const ChatView = () => {
             setShowSpinner(false)
         }
         getChatMessagesAync()
-    }, [])
+    }
+
+    const updateMessages=()=>{
+        const getChatMessagesAync = async () => {
+            const messages = await getChatsMessages(chat.id)
+            setPreventScroll(true)
+            setChatMessages(messages)
+        }
+        getChatMessagesAync()
+    }
+
 
     useEffect(() => {
         const root = document.getElementById("app-root")
@@ -95,37 +111,38 @@ const ChatView = () => {
         } else {
             setPosition("position-absolute")
         }
-        scrollToBottom()
+        if(!preventScroll){
+            scrollToBottom()
+        }
+        setPreventScroll(false)
 
     }, [chatMessages])
 
-    const sendMsg = async () => {
-        if (socketConnected) {
-            if (chatMessage.receiverId === -1) {
-                alert("Something went wrong!")
-                console.log(chatMessage)
-                return
+    const sendMsg = () => {
+        setChatMessages((prevState:ChatMessage[])=>[...prevState, {sender: cuser, date: new Date(), read:false, text: chatMessage.text}])
+        const sendAsync = async () => {
+            if (socketConnected) {
+                if (chatMessage.receiverId === -1) {
+                    alert("Something went wrong!")
+                    console.log(chatMessage)
+                    return
+                }
+                await sendMessage(chatMessage)
+                if (inputRef.current) {
+                    inputRef.current.value = ""
+                    setChatMessage({...chatMessage, text: ""})
+                }
+            } else {
+                alert("Establishing connection to user. This can take from several seconds to a minute. Please be patient and try again")
             }
-            await sendMessage(chatMessage)
-            if (inputRef.current) {
-                inputRef.current.value = ""
-                setChatMessage({...chatMessage, text: ""})
-            }
-        } else {
-            alert("Establishing connection to user. This can take from several seconds to a minute. Please be patient and try again")
         }
-
+        sendAsync()
     }
 
     const onKeyPress = (evt: KeyboardEvent) => {
         if (evt.key === 'Enter') {
             sendMsg()
         }
-    }
-
-    const addMsg = (msg: any) => {
-        setChatMessages((prevItems: any) => [...prevItems, msg]);
-        //playSound()
     }
 
     const scrollToBottom = () => {
@@ -177,40 +194,56 @@ const ChatView = () => {
         }
     }
 
+    const connectClient=()=>{
+        const onMessageRead=(readChatMessages: ChatMessage[])=>{
+            console.log("messages: ")
+            console.log(readChatMessages)
+            setChatMessages(readChatMessages)
+        }
+
+        const receiveMessages = (msg: ChatMessage[]) => {
+            setChatMessages(msg);
+        }
+
+        const onConnect = () => {
+            console.log("Connected to client")
+            showSuccess("Connected", 1000)
+            setSocketConnected(true)
+            client.subscribe("/topic/unread", (message: any) => {
+                onMessageRead((JSON.parse(message.body) as ChatMessage[]))
+            })
+            client.subscribe("/topic/message", (message: any) => {
+                receiveMessages((JSON.parse(message.body) as ChatMessage[]))
+            })
+        }
+        let client = new Client({
+            brokerURL: "ws://192.168.1.191:8080/ws-message",
+            reconnectDelay: 5000,
+            heartbeatIncoming: 400,
+            heartbeatOutgoing: 400,
+            onConnect: onConnect,
+            onDisconnect: () => {
+                console.log("Disconnected")
+            }
+        })
+
+        client.activate()
+        return client
+    }
+
+    useEffect(() => {
+        const client = connectClient()
+        return()=>{
+            const asyncDeactivate= async ()=>{
+                client.deactivate()
+            }
+            asyncDeactivate()
+        }
+    }, [])
+
+
     return (
         <>
-            {chatMessages &&
-                <>
-                    <SockJsClient
-                        url="/api/ws"
-                        topics={['/topic/message']}
-                        heartbeat={100}
-                        onMessage={(chatMessage: any) => addMsg(chatMessage)}
-                        onConnect={() => {
-                            setSocketConnected(true)
-                            console.info("Socket connected to topic: messages")
-                        }}
-                        onDisconnect={() => {
-                            setSocketConnected(false)
-                            console.log("Disconnected socket from topic: messages")
-                        }}
-                    />
-                    <SockJsClient
-                        url="/api/ws"
-                        topics={['/topic/unread']}
-                        heartbeat={100}
-                        onMessage={(unread: any) => console.log("Unread")}
-                        onConnect={() => {
-                            setSocketConnected(true)
-                            console.info("Socket connected to topic: unread")
-                        }}
-                        onDisconnect={() => {
-                            setSocketConnected(false)
-                            console.log("Disconnected socket from topic: unread")
-                        }}
-                    />
-                </>
-            }
             <div className={"container-fluid g-0 " + (isMobile ? " mobile-view" : "")}
                  style={{maxWidth: "800px"}}>
                 <Col ref={inputRef} md="auto" className="p-2 px-3">
@@ -221,13 +254,19 @@ const ChatView = () => {
                         </div>
                     }
                     <FadeIn childClassName="div" delay={0.5}>
-                        {chatMessages && chatMessages.map((m: ChatMessage) => (
-                            <div className="row g-0">
-                                <div className="col">
-                                    <ChatMessageComponent fromMe={m.sender.id === cuser.id} message={m}/>
+                        {chatMessages && chatMessages.map((message: ChatMessage) => {
+                            if(!message.sender){
+                                console.log("Sender is undefined?")
+                            }
+                            return(
+                                <div className="row g-0">
+                                    <div className="col">
+                                        <ChatMessageComponent key={"message-" + message.id} fromMe={message.sender.id === cuser.id}
+                                                              message={message}/>
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            )
+                        })}
                     </FadeIn>
                 </Col>
                 <div className={"border container-fluid chat-field g-0 p-3 " + position} style={{maxWidth: "800px"}}>
@@ -245,7 +284,9 @@ const ChatView = () => {
                             onInputChange(e)
                         }} className="form-control message-input" placeholder="Send comment"
                                aria-label="Input comment" aria-describedby="basic-addon2"/>
-                        <button onClick={sendMsg} className="btn btn-outline-primary"><i className="bi bi-send"/>
+                        <button onClick={sendMsg}
+                                className={"btn btn-outline-primary " + (socketConnected ? "" : "disabled")}><i
+                            className="bi bi-send"/>
                         </button>
                     </div>
                     <EmojiSelector setEmoji={setEmoji} hide={() => {
