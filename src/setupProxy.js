@@ -12,4 +12,15 @@ module.exports = function (app) {
             },
         })
     );
+    let wssProxy = "wss://chatapp-backend-pgoz.onrender.com"
+    app.use(
+        '/wss-api',
+        createProxyMiddleware({
+            target: wssProxy,
+            changeOrigin: true,
+            pathRewrite: {
+                "^/wss-api": "",
+            },
+        })
+    );
 };
