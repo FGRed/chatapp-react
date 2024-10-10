@@ -5,7 +5,7 @@ const SockJSWrapper = React.forwardRef((props, ref) => {
     const sockJSRef = useRef(null);
 
     useEffect(() => {
-        sockJSRef.current = new SockJSClient('/api/ws');
+        sockJSRef.current = new SockJSClient('/api/wss');
 
         return () => {
             sockJSRef.current.deactivate();
