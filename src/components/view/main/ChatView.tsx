@@ -9,15 +9,13 @@ import Chat from "../../../model/chat/Chat";
 import CUser from "../../../model/cuser/CUser";
 import {isMobile} from 'react-device-detect'
 // @ts-ignore
-import SockJsClient from 'react-stomp';
 import FadeIn from "react-fade-in";
 import useSound from "use-sound"
 // @ts-ignore
 import notif from "../../../sound/notif.mp3"
-import ChatsComponent from "../../chat/ChatsComponent";
+import ChatsChat from "../../chat/ChatsChat";
 import EmojiSelector from "../../emoji/EmojiSelector";
 import {Client} from '@stomp/stompjs';
-import {showSuccess} from "../../notifications/GeneralNotifications";
 
 const ChatView = () => {
 
@@ -33,6 +31,7 @@ const ChatView = () => {
     const [loadTime, setLoadTime] = useState(0)
     const dispatch = useDispatch()
     const [preventScroll, setPreventScroll] = useState(false)
+    const [messageSending, setMessageSending] = useState(false)
 
     useEffect(() => {
         let receiverId: number | undefined
@@ -49,7 +48,9 @@ const ChatView = () => {
             chatId: chat.id,
             text: ""
         })
-        dispatch({type: "SET_ELEMENT", element: <ChatsComponent chat={chat} className="border"/>})
+        dispatch({type: "SET_ELEMENT", element:
+                <ChatsChat chat={chat} className="border"/>
+        })
         return () => {
             window.clearInterval(interval.current)
             dispatch({type: "SET_ELEMENT", element: undefined})
@@ -88,18 +89,8 @@ const ChatView = () => {
         }
         getChatMessagesAync()
     }
-
-    const updateMessages=()=>{
-        const getChatMessagesAync = async () => {
-            const messages = await getChatsMessages(chat.id)
-            setPreventScroll(true)
-            setChatMessages(messages)
-        }
-        getChatMessagesAync()
-    }
-
-
     useEffect(() => {
+
         const root = document.getElementById("app-root")
         if (elementOverflows(root)) {
             if (isMobile) {
@@ -111,7 +102,8 @@ const ChatView = () => {
         } else {
             setPosition("position-absolute")
         }
-        if(!preventScroll){
+
+        if(!preventScroll && chatMessages.length > 0){
             scrollToBottom()
         }
         setPreventScroll(false)
@@ -120,6 +112,7 @@ const ChatView = () => {
 
     const sendMsg = () => {
         setChatMessages((prevState:ChatMessage[])=>[...prevState, {sender: cuser, date: new Date(), read:false, text: chatMessage.text}])
+        setMessageSending(true)
         const sendAsync = async () => {
             if (socketConnected) {
                 if (chatMessage.receiverId === -1) {
@@ -128,6 +121,7 @@ const ChatView = () => {
                     return
                 }
                 await sendMessage(chatMessage)
+                setMessageSending(false)
                 if (inputRef.current) {
                     inputRef.current.value = ""
                     setChatMessage({...chatMessage, text: ""})
@@ -140,7 +134,7 @@ const ChatView = () => {
     }
 
     const onKeyPress = (evt: KeyboardEvent) => {
-        if (evt.key === 'Enter') {
+        if (!messageSending && socketConnected && evt.key === 'Enter') {
             sendMsg()
         }
     }
@@ -148,7 +142,8 @@ const ChatView = () => {
     const scrollToBottom = () => {
         const root = document.getElementById("app-root")
         if (root) {
-            root.scrollTop = root.scrollHeight;
+            console.log(root.scrollHeight)
+            root.scrollTop = root.scrollHeight
         }
     };
 
@@ -199,6 +194,7 @@ const ChatView = () => {
             console.log("messages: ")
             console.log(readChatMessages)
             setChatMessages(readChatMessages)
+            setPreventScroll(true)
         }
 
         const receiveMessages = (msg: ChatMessage[]) => {
@@ -207,13 +203,28 @@ const ChatView = () => {
 
         const onConnect = () => {
             console.log("Connected to client")
-            showSuccess("Connected", 1000)
             setSocketConnected(true)
-            client.subscribe("/topic/unread", (message: any) => {
+            client.subscribe("/topic/unread/"+chat.id, (message: any) => {
                 onMessageRead((JSON.parse(message.body) as ChatMessage[]))
             })
-            client.subscribe("/topic/message", (message: any) => {
+            client.subscribe("/topic/chat/"+chat.id, (message: any) => {
                 receiveMessages((JSON.parse(message.body) as ChatMessage[]))
+            })
+            client.subscribe("/topic/participant-status", (message: any) => {
+                const participant = JSON.parse(message.body)
+                const newParticipants = chat.chatParticipants.map(p=>{
+                    if(p.id === participant.id){
+                        p = participant
+                    }
+                    return p
+                })
+
+                const newChat = {...chat, chatParticipants: newParticipants}
+                console.log(newChat)
+                dispatch({type:"SET_CHAT", chat: newChat})
+                dispatch({type: "SET_ELEMENT", element:
+                        <ChatsChat chat={newChat} className="border"/>
+                })
             })
         }
         let client = new Client({
@@ -245,7 +256,7 @@ const ChatView = () => {
     return (
         <>
             <div className={"container-fluid g-0 " + (isMobile ? " mobile-view" : "")}
-                 style={{maxWidth: "800px"}}>
+                 style={{maxWidth: "1400px"}}>
                 <Col ref={inputRef} md="auto" className="p-2 px-3">
                     {showSpinner &&
                         <div className="no-content">
@@ -253,23 +264,23 @@ const ChatView = () => {
                             <span>Loading messages. Please wait... {loadTime}s</span>
                         </div>
                     }
-                    <FadeIn childClassName="div" delay={0.5}>
-                        {chatMessages && chatMessages.map((message: ChatMessage) => {
-                            if(!message.sender){
-                                console.log("Sender is undefined?")
-                            }
-                            return(
+                    {chatMessages && chatMessages.map((message: ChatMessage) => {
+                        if(!message.sender){
+                            console.log("Sender is undefined?")
+                        }
+                        return(
+                            <FadeIn childClassName="div">
                                 <div className="row g-0">
                                     <div className="col">
                                         <ChatMessageComponent key={"message-" + message.id} fromMe={message.sender.id === cuser.id}
                                                               message={message}/>
                                     </div>
                                 </div>
-                            )
-                        })}
-                    </FadeIn>
+                            </FadeIn>
+                        )
+                    })}
                 </Col>
-                <div className={"border container-fluid chat-field g-0 p-3 " + position} style={{maxWidth: "800px"}}>
+                <div className={"border container-fluid chat-field g-0 p-3 " + position} style={{maxWidth: "1400px"}}>
                     <div className="input-group">
                         {!isMobile &&
                             <button className="btn btn-outline-secondary" onClick={() => {
@@ -285,7 +296,7 @@ const ChatView = () => {
                         }} className="form-control message-input" placeholder="Send comment"
                                aria-label="Input comment" aria-describedby="basic-addon2"/>
                         <button onClick={sendMsg}
-                                className={"btn btn-outline-primary " + (socketConnected ? "" : "disabled")}><i
+                                className={"btn btn-outline-primary " + (socketConnected || messageSending ? "" : "disabled")}><i
                             className="bi bi-send"/>
                         </button>
                     </div>

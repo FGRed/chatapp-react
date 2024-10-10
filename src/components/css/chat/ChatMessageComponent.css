@@ -47,9 +47,8 @@
 }
 .text{
     overflow-wrap: break-word;
-    max-width: 80%;
+    max-width: 100%;
 }
 small.read-date{
     font-size: 10px !important;
-
 }

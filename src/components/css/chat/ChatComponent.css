@@ -1,27 +1,43 @@
-.chat-component{
+.chat-component {
     display: flex;
-    gap: 20px;
+    gap: 5px;
     z-index: 1;
     background: #212529;
 }
-.chat-component:hover{
+
+#chats-view > .chat-component:hover {
     background: #282c34;
     cursor: pointer;
 }
+
 .chat-component > .chats-avatar {
-    flex: 0 0 100px;
+    flex: 0 0 50px;
     display: flex;
     justify-content: center;
     align-items: center;
 }
-.chat-component > .chat-info{
+
+.chat-component > .chat-info {
     flex: 1;
 }
-.chat-component-header{
+
+.chat-component-header {
     display: flex;
     gap: 10px;
     align-items: center;
 }
-.chat-component-header > small{
-   font-size: 12px;
+
+.chat-component-header > small {
+    font-size: 12px;
+}
+
+.chat-component-online-dot {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    font-size: 10px;
+}
+
+.chat-component-online-dot.online {
+    color: green !important;
 }

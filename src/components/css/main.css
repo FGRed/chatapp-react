@@ -35,6 +35,12 @@
     color: #ffffff !important;
     background: rgb(118, 118, 118) !important;
 }
+.bg-main{
+    background: #282c34 !important;
+}
+.bg-foreground{
+    background: #212529 !important;
+}
 .bg-hover{
     background: var(--color-hover);
 }
@@ -49,4 +55,8 @@
 }
 .form-control {
     padding-right: 50px;
+}
+.pointer-on-hover:hover{
+    cursor: pointer;
+    background: #282c34;
 }

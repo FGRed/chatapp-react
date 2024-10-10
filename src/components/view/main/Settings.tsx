@@ -7,6 +7,7 @@ import {useDispatch, useSelector} from "react-redux";
 import CUser from "../../../model/cuser/CUser";
 import {logout} from "../../../service/cuser/CUserService";
 import {useNavigate} from "react-router";
+import {showDialog} from "../../dialog/Dialog";
 
 
 const Settings = () => {
@@ -26,21 +27,21 @@ const Settings = () => {
     const onLogout = () => {
 
         const logoutAsync= async()=>{
-            const cuser = await logout()
-            dispatch({type: "RESET_USER"})
-            dispatch({type:"HIDE_DIALOG"})
+            return  await logout()
         }
 
-        dispatch({
-            type:"SET_DIALOG",
-            message:"Are you sure you want to log out?",
-            title:"Warning",
-            acceptFunction:()=>{
-                 logoutAsync()
+        showDialog(
+            "Are you sure you want to log out?",
+            "Warning",
+            ()=>{
+                logoutAsync().then(_=>{
+                    dispatch({type: "RESET_USER"})
+                    dispatch({type:"HIDE_DIALOG"})
+                }).catch(error=>{
+                  console.log(error)
+                })
             }
-        })
-
-
+        )
     }
 
     return (

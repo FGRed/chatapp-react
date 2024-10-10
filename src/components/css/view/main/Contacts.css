@@ -1,5 +1,6 @@
 .contact--contact-list-item {
     display: flex;
+    gap: 10px;
 }
 
 .contact--contact-list-item > .right{
@@ -7,5 +8,9 @@
 }
 
 .contact--contact-list-item > .left {
-    flex: 0 0 100px;
+    flex: 0 0 50px;
+}
+.users-row{
+    max-height: 500px;
+    overflow: auto;
 }

@@ -23,7 +23,7 @@ const Avatar: FC<avatarProps> = ({avatar, children, style, className, variant}) 
     return (
         <Ratio aspectRatio="1x1" className={variantClass + " " + className} style={style}>
             <div>
-                <div className="avatar border border-secondary rounded"
+                <div className="avatar border border-secondary rounded position-relative"
                      style={{backgroundImage: "url(\"data:image/jpeg;base64," + avatar + "\")"}}/>
                 {children}
             </div>

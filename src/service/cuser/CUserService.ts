@@ -1,14 +1,24 @@
 import axios, {AxiosError} from "axios";
 
-export const logIn = async (username: string, password: string) => {
+export const logIn = async (username: string, password: string, logoutActive?: boolean | undefined) => {
     try {
         const formData: FormData = new FormData()
         formData.append("username", username)
         formData.append("password", password)
-        const response = await axios.post("/api/session/", formData)
+        if(logoutActive){
+            formData.append("logout-active", String(logoutActive))
+        }
+
+        console.log("Logging in")
+        const response = await axios.post("/api/session/log-in", formData)
         return response.data
-    } catch (ex) {
-        console.error(ex)
+    } catch (error) {
+        if(axios.isAxiosError(error)){
+            const axiosError = error as AxiosError
+            if(axiosError.response){
+                return axiosError.response.data
+            }
+        }
     }
 }
 
@@ -40,10 +50,12 @@ export const setUsername = async (username: string) => {
 }
 export const logout = async () => {
     try {
-        const response = await axios.delete(`/api/session/logout`)
+        const response = await axios.delete(`/api/session/log-out`)
         return response.data
-    } catch (ex) {
-        console.error(ex)
+    } catch (error: unknown) {
+        if(axios.isAxiosError(error)){
+            console.log(error.response)
+        }
     }
 }
 
@@ -64,7 +76,7 @@ export const userAlreadyLoggedIn = async (username: string, password: string) =>
         formData.append("username", username)
         formData.append("password", password)
         const response = await axios.post(`/api/session/in-registry/`, formData)
-        return response.data
+        return response.data.value0
     } catch (ex:any) {
         console.error(ex)
         return ex.response.data
@@ -83,10 +95,24 @@ export const submitForm = async (formData:FormData) => {
 
 export const getUsersList = async () => {
     try {
-        const response = await axios.get(`/api/cuser/list`)
+        const response = await axios.get(`/api/cuser/`)
         return response.data
     } catch (ex:any) {
         console.error(ex)
         return ex.response.data
     }
+}
+
+export const find = async (keyword:string) => {
+    try {
+        const response = await axios.get(`/api/cuser/find/`+keyword)
+        return response.data
+    } catch (ex:any) {
+        console.error(ex)
+        return ex.response.data
+    }
+}
+
+export const loginAndLogoutAlreadyLoggedInUser = async (username:string, password:string) =>{
+
 }
